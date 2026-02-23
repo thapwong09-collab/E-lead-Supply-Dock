@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Queue Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <h2>Staff - Queue Management</h2>
+
+  <button onclick="loadQueue()">Refresh Queue</button>
+
+  <div id="queueList"></div>
+
+  <script>
+    const { createClient } = supabase;
+
+    const supabaseUrl = "https://myonbwhvxoyogwdwgrpq.supabase.co";
+    const supabaseKey = "ใส่ anon key ของคุณ";
+
+    const db = createClient(supabaseUrl, supabaseKey);
+
+    async function loadQueue() {
+
+      const { data, error } = await db
+        .from("bookings")
+        .select("*")
+        .eq("status", "waiting")
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const container = document.getElementById("queueList");
+      container.innerHTML = "";
+
+      if (data.length === 0) {
+        container.innerHTML = "ไม่มีคิวรอ";
+        return;
+      }
+
+      data.forEach(item => {
+
+        const div = document.createElement("div");
+        div.style.border = "1px solid black";
+        div.style.padding = "10px";
+        div.style.margin = "5px";
+
+        div.innerHTML = `
+          <b>${item.booking_number}</b><br>
+          ${item.supplier_name}<br>
+          <button onclick="callQueue(${item.id})">เรียกคิวนี้</button>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    async function callQueue(id) {
+
+      const { error } = await db
+        .from("bookings")
+        .update({ status: "called" })
+        .eq("id", id);
+
+      if (error) {
+        alert("เกิดข้อผิดพลาด");
+      } else {
+        alert("เรียกคิวแล้ว");
+        loadQueue();
+      }
+    }
+
+    loadQueue();
+  </script>
+
+</body>
+</html>
