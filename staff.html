@@ -17,15 +17,15 @@
     const { createClient } = supabase;
 
     const supabaseUrl = "https://myonbwhvxoyogwdwgrpq.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15b25id2h2eG95b2d3ZHdncnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzEyMzksImV4cCI6MjA4NzE0NzIzOX0.txYHh142IExZJL8KzMgOOg9g2ZXwqPM33Ci4b1XKVuM";
+    const supabaseKey = "ใส่ anon key ของคุณ";
 
     const db = createClient(supabaseUrl, supabaseKey);
 
     async function loadQueue() {
-
       const { data, error } = await db
         .from("bookings")
         .select("*")
+        .eq("status", "waiting")
         .order("created_at", { ascending: true });
 
       if (error) {
@@ -36,13 +36,12 @@
       const container = document.getElementById("queueList");
       container.innerHTML = "";
 
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         container.innerHTML = "ไม่มีคิวรอ";
         return;
       }
 
       data.forEach(item => {
-
         const div = document.createElement("div");
         div.style.border = "1px solid black";
         div.style.padding = "10px";
@@ -59,13 +58,13 @@
     }
 
     async function callQueue(id) {
-
       const { error } = await db
         .from("bookings")
         .update({ status: "called" })
         .eq("id", id);
 
       if (error) {
+        console.error(error);
         alert("เกิดข้อผิดพลาด");
       } else {
         alert("เรียกคิวแล้ว");
@@ -77,6 +76,4 @@
   </script>
 
 </body>
-
 </html>
-
