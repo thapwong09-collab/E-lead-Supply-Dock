@@ -26,7 +26,6 @@
       const { data, error } = await db
         .from("bookings")
         .select("*")
-        .eq("status", "waiting")
         .order("created_at", { ascending: true });
 
       if (error) {
@@ -78,4 +77,5 @@
   </script>
 
 </body>
+
 </html>
